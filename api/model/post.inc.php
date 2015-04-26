@@ -19,7 +19,7 @@ class Post extends Model {
 			$this->db->commit();
 
 			// Fetch complete record of newly inserted record
-			$stmt = $this->db->prepare("SELECT * FROM posts WHERE id=:postid LIMIT 1");
+			$stmt = $this->db->prepare("SELECT id, author, content, DATE_FORMAT(created, '%Y-%m-%dT%TZ') created FROM posts WHERE id=:postid LIMIT 1");
 			$stmt->execute(array(':postid' => $new_post_id));
 			// Store result as an associative array
 			$insert = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -45,7 +45,7 @@ class Post extends Model {
 	public function getPost($postid) {
 		try {
 
-			$stmt = $this->db->prepare("SELECT * FROM posts WHERE id=:postid LIMIT 1");
+			$stmt = $this->db->prepare("SELECT id, author, content, DATE_FORMAT(created, '%Y-%m-%dT%TZ') created FROM posts WHERE id=:postid LIMIT 1");
 			$stmt->execute(array(':postid' => $postid));
 			$get_post = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -68,7 +68,7 @@ class Post extends Model {
 
 		try {
 
-			$stmt = $this->db->prepare("SELECT * FROM posts ORDER BY created DESC");
+			$stmt = $this->db->prepare("SELECT id, author, content, DATE_FORMAT(created, '%Y-%m-%dT%TZ') created FROM posts ORDER BY created DESC");
 			$stmt->execute();
 			// Note fetchAll, instead of fetch. fetchAll fetches mutiple records
 			$get_posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -133,7 +133,7 @@ class Post extends Model {
 				return $this->ERROR;
 			}
 
-			$stmt = $this->db->prepare("SELECT * FROM posts WHERE id=:postid LIMIT 1");
+			$stmt = $this->db->prepare("SELECT id, author, content, DATE_FORMAT(created, '%Y-%m-%dT%TZ') created FROM posts WHERE id=:postid LIMIT 1");
 			$stmt->execute(array(':postid' => $postid));
 			$updated_post = $stmt->fetch(PDO::FETCH_ASSOC);
 

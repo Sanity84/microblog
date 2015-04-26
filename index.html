@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="Microblog">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0">
+	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+	<link rel="stylesheet" href="css/styles.css">
+	<title>Microblog</title>
+</head>
+<body>
+	<div class="container" ng-controller="AppController">
+		<div class="row">
+			<div class="col-lg-12">
+				<h1>Microblog App Demo</h1>
+				<p class="lead">Powered by SlimPHP RESTful API backend</p>
+			</div>
+			<div class="col-lg-4">
+				<ul class="list-group">
+					<li class="list-group-item" ng-repeat="post in posts">
+						<div ng-hide="edit">
+							<div class="pull-right">
+								<span class="margin-left-10 glyphicon glyphicon-pencil" aria-hidden="true" ng-click="edit = !edit; revert(post)"></span>
+								<span class="glyphicon glyphicon-remove" aria-hidden="true" ng-click="remove(post)"></span>
+							</div>
+							<p class="no-margin-bottom">{{ post.content }}</p>
+							<small>--{{ post.author }} @ {{ post.created | date:'short':'UTC' }}</small>
+						</div>
+						<!-- Editable text -->
+						<div ng-show="edit">
+							<form class="form" ng-submit="update(edit_post, post)">
+								<div class="form-group">
+									<textarea type="text" ng-model="edit_post.content" class="form-control" rows="3" maxlength="255"></textarea>
+								</div>
+								<div class="form-group">
+									<input type="text" class="form-control" ng-model="edit_post.author" maxlength="20">
+								</div>
+								<input type="submit" value="Update" class="btn btn-success pull-right margin-left-10" ng-click="edit = !edit"> 
+								<input type="button" value="Cancel" ng-click="edit = !edit" class="btn btn-default pull-right">
+							</form>
+							<div class="clearfix"></div>
+						</div>
+					</li>
+				</ul>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-lg-4">
+				<form class="form" ng-submit="create(post)">
+					<div class="form-group">
+						<label for="author" class="label-control">Author</label>
+						<input type="text" class="form-control" name="author" ng-model="post.author" maxlength="20">
+					</div>
+					<div class="form-group">
+						<label for="content" class="label-control">Post</label>
+						<textarea class="form-control" rows="3" name="content" ng-model="post.content" maxlength="255"></textarea> 
+					</div>
+					<input type="submit" class="btn btn-primary pull-right" value="Post">
+					<div class="clearfix"></div>
+				</form>
+			</div>
+		</div>
+	</div>
+	<script rel="application/json" src="bower_components/angular/angular.min.js"></script>
+	<script rel="application/json" src="bower_components/angular-resource/angular-resource.min.js"></script>
+	<script rel="application/json" src="app/app.js"></script>
+	<script rel="application/json" src="app/controllers/app.controller.js"></script>
+	<script rel="application/json" src="app/services/app.service.js"></script>
+</body>
+</html>
