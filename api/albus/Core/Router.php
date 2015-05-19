@@ -153,7 +153,7 @@ class Router {
 		// Set optional param flags
 		$opt = $this->optParam($pattern);
 
-		// flag to indicate optional param
+		// prepare pattern, transform router pattern string to assoc array
 		$pattern = $this->preparePattern($pattern);
 
 		// Compare uri to router pattern

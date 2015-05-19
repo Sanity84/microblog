@@ -12,21 +12,27 @@
 
 		$scope.create = function(post) {
 			Post.save(post, function(response) {
-				if(response.status == 200) {
-					$scope.posts.unshift(response.data);
-					$scope.post = {};
-				}else{
-					console.log(response.data.message);
-				}
+				// success
+				$scope.posts.unshift(response);
+				$scope.post = {};
+	
+			}, function(response) {
+				// error
+				var message = response.data.message;
+				alert(message);
+				
 			});
 		};
 
 		$scope.remove = function(post) {
 			Post.remove({postid: post.id}, function(response) {
-				if(response.status == 200) {
-					var index = $scope.posts.indexOf(post);
-					$scope.posts.splice(index, 1);
-				}
+				// success
+				var index = $scope.posts.indexOf(post);
+				$scope.posts.splice(index, 1);
+				
+			}, function(response) {
+				// error
+				alert(response.data.message);
 			});
 		};
 
@@ -38,13 +44,13 @@
 
 		$scope.update = function(post, original_post) {
 			Post.put({postid: post.id}, post, function(response) {
-				if(response.status == 200) {
-					var index = $scope.posts.indexOf(original_post);
-					$scope.posts[index] = response.data;
+				
+				var index = $scope.posts.indexOf(original_post);
+				$scope.posts[index] = response;
 
-				}else{
-					console.log(response.data.messasge);
-				}
+			}, function(response) {
+				// error
+				alert(response.data.message);
 			});
 		};
 

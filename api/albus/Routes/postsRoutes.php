@@ -36,7 +36,7 @@ $router->get('/', function() use ($res) {
 							<h4>GET /api/posts(/:postid)?args</h4><br>
 							Retrieve list of specified posts or single post if postid is provided. Args available are:
 							author,limit,offset and fields = id,author,content,created<br>
-							<small>Example: <a href="http://andrewtorrez.com/microblog/api/posts/?limit=3&fields=author,content,created">http://andrewtorrez.com/microblog/api/posts/?limit=3&fields=author,content,created</a></small>
+							<small>Example: <a href="posts/?limit=3&fields=author,content,created">http://andrewtorrez.com/microblog/api/posts/?limit=3&fields=author,content,created</a></small>
 						</li>
 						<li class="list-group-item">
 							<h4>POST /api/posts</h4><br>
@@ -124,7 +124,7 @@ $router->post('/posts', function() use ($req, $res, $db, $post_validation) {
 	try {
 		$id;
 		$db->getDb()->beginTransaction();
-		$stmt = $db->getDb()->prepare('INSERT INTO posts (author, content) VALUES (:author, :content)');
+		$stmt = $db->getDb()->prepare('UPDATE posts SET id=:id, author=:author, content=:content WHERE id=:id');
 		$insert = $stmt->execute($db->prepareData($body, $post_validation->getRules()));
 		if(!$insert) {
 			$db->getDb()->rollBack();
@@ -140,9 +140,72 @@ $router->post('/posts', function() use ($req, $res, $db, $post_validation) {
 		$post = $stmt->fetch(PDO::FETCH_ASSOC);
 
 	}catch(PDOException $e) {
+		$db->getDb()->rollBack();
 		echo json_encode($res->error(array('message' => $e->getMessage())), JSON_PRETTY_PRINT);
 		return;
 	}
 
 	echo json_encode($res->created($post), JSON_PRETTY_PRINT);
 });
+
+// update not working correctly...
+$router->put('/posts/:postid', function($postid) use ($req, $res, $db, $post_validation) {
+	$res->setContentType('application/json');
+	// rules must be tweaked for updates
+	$updated_rules = $post_validation->getRules();
+	$updated_rules['created'] = array();
+	$updated_rules['id'] = array();
+	$post_validation->setRules($updated_rules);
+
+	$body = json_decode($req->getBody(), true);
+	$body['id'] = $postid; // inject indicated postid
+
+	if(!$post_validation->test($body)) {
+		echo json_encode($res->error(array('message' => $post_validation->getMessage())), JSON_PRETTY_PRINT);
+		return;
+	}
+	$post = array();
+
+	try {
+		$db->getDb()->beginTransaction();
+		$stmt = $db->getDb()->prepare('REPLACE INTO posts SET id=:id, author=:author, content=:content, created=:created');
+		$insert = $stmt->execute($db->prepareData($body, $post_validation->getRules()));
+		if(!$insert) {
+			$db->getDb()->rollBack();
+			echo json_encode($res->error(array('message' => 'An error occured')), JSON_PRETTY_PRINT);
+			return;
+		}
+		$db->getDb()->commit();
+
+		$stmt = $db->getDb()->prepare('SELECT * FROM posts WHERE id=:id LIMIT 1');
+		$stmt->execute(array('id' => $postid));
+		$post = $stmt->fetch(PDO::FETCH_ASSOC);
+
+	}catch(PDOException $e) {
+		$db->getDb()->rollBack();
+		echo json_encode($res->error(array('message' => $e->getMessage())), JSON_PRETTY_PRINT);
+		return;
+	}
+	// create or ok seems to be a valid option here
+	echo json_encode($res->created($post), JSON_PRETTY_PRINT);
+});
+
+$router->delete('/posts/:postid', function($postid) use ($res, $db) {
+	$res->setContentType('application/json');
+
+	try {
+		$stmt = $db->getDb()->prepare('DELETE FROM posts WHERE id=:postid');
+		$delete = $stmt->execute(array(':postid' => $postid));
+		if(!$delete) {
+			echo json_encode($res->error(array('message' => 'An error occured')), JSON_PRETTY_PRINT);
+			return;
+		}
+
+	}catch(PDOException $e) {
+		echo json_encode($res->error(array('message' => $e->getMessage())), JSON_PRETTY_PRINT);
+		return;
+	}
+
+	echo json_encode($res->ok(array('message' => 'Deleted')), JSON_PRETTY_PRINT);
+});
+
