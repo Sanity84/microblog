@@ -13,7 +13,7 @@
 		$scope.create = function(post) {
 			Post.save(post, function(response) {
 				// success
-				$scope.posts.unshift(response);
+				$scope.posts.push(response);
 				$scope.post = {};
 	
 			}, function(response) {

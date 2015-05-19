@@ -124,7 +124,7 @@ $router->post('/posts', function() use ($req, $res, $db, $post_validation) {
 	try {
 		$id;
 		$db->getDb()->beginTransaction();
-		$stmt = $db->getDb()->prepare('UPDATE posts SET id=:id, author=:author, content=:content WHERE id=:id');
+		$stmt = $db->getDb()->prepare('INSERT INTO posts (author, content) VALUES (:author, :content)');
 		$insert = $stmt->execute($db->prepareData($body, $post_validation->getRules()));
 		if(!$insert) {
 			$db->getDb()->rollBack();
@@ -148,7 +148,7 @@ $router->post('/posts', function() use ($req, $res, $db, $post_validation) {
 	echo json_encode($res->created($post), JSON_PRETTY_PRINT);
 });
 
-// update not working correctly...
+
 $router->put('/posts/:postid', function($postid) use ($req, $res, $db, $post_validation) {
 	$res->setContentType('application/json');
 	// rules must be tweaked for updates
