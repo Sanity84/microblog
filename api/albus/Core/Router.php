@@ -222,8 +222,24 @@ class Router {
 			$response = new Response();
 			$response->setContentType('text/html');
 			echo $response->notfound('
-				<h1>404 Not Found</h1>
-				<p>The data you are looking for was not found</p>
+				<!DOCTYPE html>
+				<html>
+				<head>
+					<meta name="viewport" content="width=device-width,initial-scale=1.0">
+					<title>Albus RESTful Framework</title>
+					<link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+				</head>
+				<body>
+					<div class="container">
+						<div class="row">
+							<div class="col-lg-12">
+								<h1>404 Not Found</h1>
+								<p class="lead">The requested URL was not found.</p>
+							</div>
+						</div>
+					</div>
+				</body>
+				</html>
 			');
 		}
 	}
